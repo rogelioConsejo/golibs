@@ -1,0 +1,6 @@
+package persistencia
+
+const DBUser = "{DBUserName}"
+const DBPass = "{DBPassword}"
+const DBName = "{DBName}"
+
