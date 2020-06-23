@@ -10,11 +10,13 @@ _ "github.com/go-sql-driver/mysql"
 type CredencialesSQL struct {
 	User     string
 	Password string
+	Host string
 }
 
 //ConectarMySQL crea una conexión a una base de datos MySQL.
 func ConectarMySQL(credenciales CredencialesSQL, nombreDeBaseDeDatos string) (*sql.DB, error) {
-	datosParaConectarse := fmt.Sprintf("%s:%s@/%s?parseTime=true", credenciales.User, credenciales.Password, nombreDeBaseDeDatos)
+	datosParaConectarse := fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true",
+		credenciales.User, credenciales.Password, credenciales.Host, nombreDeBaseDeDatos)
 
 	baseDeDatos, err := sql.Open("mysql", datosParaConectarse)
 	if err != nil {
