@@ -3,7 +3,7 @@ package dbdef
 import (
 	"database/sql"
 	"fmt"
-	"github.com/rogelioConsejo/golibs/persistencia"
+	"github.com/rogelioConsejo/golibs/old/persistencia"
 	"strings"
 )
 

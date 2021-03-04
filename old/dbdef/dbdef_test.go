@@ -1,7 +1,7 @@
 package dbdef
 
 import (
-	"github.com/rogelioConsejo/golibs/persistencia"
+	"github.com/rogelioConsejo/golibs/old/persistencia"
 	"testing"
 )
 
