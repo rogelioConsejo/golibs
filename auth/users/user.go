@@ -1,31 +1,19 @@
 package users
 
-import "github.com/rogelioConsejo/golibs/auth/roles"
-
 type User interface {
 	Name() string
-	Roles() []roles.Role
 }
 
-type Catalog interface {
-	CatalogReader
-	CatalogWriter
+type user struct {
+	name string
 }
 
-type CatalogReader interface {
-	Users() []User
+func NewUser(name string, password string) *user {
+	newUser := user{name: name}
+	return &newUser
 }
 
-type CatalogWriter interface {
-	Creator
-	Modifier
+func (u *user) Name() string {
+	return u.name
 }
 
-type Creator interface {
-	Add(User) error
-}
-
-type Modifier interface {
-	Delete(name string) error
-	Update(User) error
-}
