@@ -3,5 +3,5 @@ module github.com/rogelioConsejo/golibs
 go 1.19
 
 require (
-	github.com/rogelioConsejo/golibs/file v0.1.0
+	github.com/rogelioConsejo/golibs/file latest
 )
