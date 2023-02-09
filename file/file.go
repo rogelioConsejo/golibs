@@ -20,6 +20,9 @@ type persistence struct {
 
 func (p *persistence) Get(something interface{}) error {
 	f, err := os.OpenFile(string(p.fileName), os.O_RDONLY|os.O_APPEND|os.O_CREATE, 0644)
+	if err != nil {
+		return err
+	}
 	defer func(f *os.File) {
 		_ = f.Close()
 	}(f)
@@ -33,6 +36,9 @@ func (p *persistence) Get(something interface{}) error {
 
 func (p *persistence) Save(something interface{}) error {
 	f, err := os.OpenFile(string(p.fileName), os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
+	if err != nil {
+		return err
+	}
 	defer func(f *os.File) {
 		_ = f.Close()
 	}(f)
