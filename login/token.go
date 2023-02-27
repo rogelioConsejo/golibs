@@ -2,6 +2,12 @@ package login
 
 import "github.com/google/uuid"
 
+// GetTokenMaker returns a TokenMaker that uses the given persistence
+func GetTokenMaker(cPer CredentialsPersistence, tPer TokenPersistence) TokenMaker {
+	return tokenMaker{credentialsPersistence: cPer, tokenPersistence: tPer}
+}
+
+// TokenMaker generates tokens
 type TokenMaker interface {
 	GenerateToken(UserName, Password) Token
 }

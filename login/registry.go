@@ -1,5 +1,11 @@
 package login
 
+// GetUserRegistry returns a UserRegistry that uses the given persistence
+func GetUserRegistry(p CredentialsPersistence) UserRegistry {
+	return userRegistry{credentialsPersistence: p}
+}
+
+// UserRegistry adds users
 type UserRegistry interface {
 	AddUser(u UserName, p Password)
 }
