@@ -5,6 +5,12 @@ import (
 	"fmt"
 )
 
+// GetDoorman returns a Doorman that uses the given persistence
+func GetDoorman(p TokenPersistence) Doorman {
+	return doorman{tokenPersistence: p}
+}
+
+// Doorman validates tokens
 type Doorman interface {
 	ValidateToken(tk Token) (UserName, bool)
 }
