@@ -16,6 +16,7 @@ type corsEnabledHandler struct {
 
 func (c corsEnabledHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	if request.Method == http.MethodOptions {
+		writer.WriteHeader(http.StatusNoContent)
 		writer.Header().Set("Access-Control-Allow-Origin", "*")
 		writer.Header().Set("Access-Control-Allow-Methods", strings.Join(c.methods, ","))
 		writer.WriteHeader(http.StatusOK)
