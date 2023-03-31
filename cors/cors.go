@@ -20,7 +20,7 @@ func (c corsEnabledHandler) ServeHTTP(writer http.ResponseWriter, request *http.
 		methods := append(c.methods, http.MethodOptions)
 		writer.Header().Add("Access-Control-Allow-Headers", "*")
 		writer.Header().Set("Access-Control-Allow-Methods", strings.Join(methods, ","))
-		writer.WriteHeader(http.StatusNoContent)
+		writer.WriteHeader(http.StatusOK)
 		return
 	}
 	c.handler.ServeHTTP(writer, request)
