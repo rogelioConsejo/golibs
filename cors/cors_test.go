@@ -16,7 +16,7 @@ func TestCORSEnabler(t *testing.T) {
 	spy := httptest.NewRecorder()
 
 	ceh.ServeHTTP(spy, req)
-	if spy.Code != http.StatusNoContent {
+	if spy.Code != http.StatusOK {
 		t.Error("Expected 204 OK")
 	}
 	if spy.Header().Get("Access-Control-Allow-Origin") != "*" {

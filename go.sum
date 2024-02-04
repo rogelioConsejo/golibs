@@ -1,4 +1,2 @@
-github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
-github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/rogelioConsejo/golibs/file v0.0.0-20230227191150-ffca48b4a886 h1:LJBEoRktDOzWu2JYMbXqu54BVpMXRQxQHxyvWF/YTW8=
-github.com/rogelioConsejo/golibs/file v0.0.0-20230227191150-ffca48b4a886/go.mod h1:FOrgu79xcMvO3l6VOFPcOlQuh3a1P1vp2QEjDSrpnWo=
+github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
+github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
