@@ -5,7 +5,7 @@
  CORS handling, user authentication, and more.
 
  The project aims to offer easy-to-integrate solutions that can help developers save time and effort in setting up
- foundational features of their applications.
+ foundational features of their applications. 
  
  ## Features
     - Basic CORS handling

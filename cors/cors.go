@@ -38,12 +38,13 @@ func (c corsEnabledHandler) handleOptionsResponse(writer http.ResponseWriter) {
 }
 
 func (c corsEnabledHandler) setAllowedOrigin(writer http.ResponseWriter) {
-	const defaultOrigin = "*"
 	var origin string
 	if c.origin != "" {
 		origin = string(c.origin)
 	} else {
-		origin = defaultOrigin
+		origin = DefaultOrigin
 	}
 	writer.Header().Set("Access-Control-Allow-Origin", origin)
 }
+
+const DefaultOrigin = "*"
