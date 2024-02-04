@@ -5,12 +5,17 @@ import (
 	"os"
 )
 
+// New returns a new Persistence that saves and gets something from the given file
 func New(n Name) Persistence {
 	return &persistence{fileName: n}
 }
 
+// Persistence is a type that can save and get something
+// It can be used to save a collection in which case the collection must be handled by the user
 type Persistence interface {
+	// Save overwrites the file with the given something
 	Save(something interface{}) error
+	// Get reads the file and stores the content in the given something (which must be a pointer)
 	Get(something interface{}) error
 }
 
