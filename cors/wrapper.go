@@ -6,15 +6,24 @@ func NewWrapper() Wrapper {
 	return &wrapper{}
 }
 
+// Wrapper is a type that can wrap a http.Handler to enable CORS
+// It allows to set the origin, the methods and if credentials are allowed
+// The wrap configuration must be done before calling Wrap
 type Wrapper interface {
+	//Wrap returns a new http.Handler that wraps the given handler and enables CORS with the given configuration
 	Wrap(http.Handler) http.Handler
+	//SetOrigin sets the origin for the CORS configuration to the given URL, otherwise it will default to *
 	SetOrigin(URL)
+	//AddMethod adds a method to the CORS configuration
 	AddMethod(s Method)
+	//SetAllowCredentials sets the CORS configuration to allow credentials
 	SetAllowCredentials()
 }
 
+// URL is a type that represents a URL
 type URL string
 
+// Method is a type that represents an HTTP method
 type Method string
 
 type wrapper struct {
