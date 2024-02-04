@@ -30,7 +30,7 @@ func TestWrapper_Wrap(t *testing.T) {
 
 func TestWrapper_SetOrigin(t *testing.T) {
 	t.Parallel()
-	t.Run("SetAllowedOrigin sets the Access-Control-Allow-Origin header", func(t *testing.T) {
+	t.Run("setAllowedOrigin sets the Access-Control-Allow-Origin header", func(t *testing.T) {
 		t.Parallel()
 		w := NewWrapper()
 		const url = "https://example.com"
