@@ -1,4 +1,4 @@
-package testing
+package helpers
 
 import "math/rand"
 
