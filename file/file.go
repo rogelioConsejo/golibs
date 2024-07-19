@@ -2,12 +2,27 @@ package file
 
 import (
 	"encoding/json"
+	"errors"
+	"io"
 	"os"
 )
 
-// New returns a new Persistence that saves and gets something from the given file
+// GetPersistence returns a Persistence that saves and gets something from the given file, it is thread safe and returns
+// the same instance for the same file
+func GetPersistence(n Name) Persistence {
+	if p, ok := persistences[n]; ok {
+		return p
+	}
+	p := &persistence{mutex: NewMutex(n)}
+	persistences[n] = p
+	return p
+}
+
+var persistences = make(map[Name]Persistence)
+
+// New (deprecated) returns a new Persistence that saves and gets something from the given file
 func New(n Name) Persistence {
-	return &persistence{fileName: n}
+	return &persistence{mutex: NewMutex(n)}
 }
 
 // Persistence is a type that can save and get something
@@ -17,14 +32,25 @@ type Persistence interface {
 	Save(something interface{}) error
 	// Get reads the file and stores the content in the given something (which must be a pointer)
 	Get(something interface{}) error
+	Lock()
+	Unlock()
 }
 
 type persistence struct {
 	fileName Name
+	mutex    *Mutex
+}
+
+func (p *persistence) Lock() {
+	p.mutex.Lock()
+}
+
+func (p *persistence) Unlock() {
+	p.mutex.Unlock()
 }
 
 func (p *persistence) Get(something interface{}) error {
-	f, err := os.OpenFile(string(p.fileName), os.O_RDONLY|os.O_APPEND|os.O_CREATE, 0644)
+	f, err := p.mutex.GetFile(Read)
 	if err != nil {
 		return err
 	}
@@ -32,15 +58,15 @@ func (p *persistence) Get(something interface{}) error {
 		_ = f.Close()
 	}(f)
 	decoder := json.NewDecoder(f)
-	err = decoder.Decode(&something)
-	if err != nil {
+	err = decoder.Decode(something)
+	if err != nil && !errors.Is(err, io.EOF) {
 		return err
 	}
 	return nil
 }
 
 func (p *persistence) Save(something interface{}) error {
-	f, err := os.OpenFile(string(p.fileName), os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
+	f, err := p.mutex.GetFile(Write)
 	if err != nil {
 		return err
 	}
@@ -48,9 +74,6 @@ func (p *persistence) Save(something interface{}) error {
 		_ = f.Close()
 	}(f)
 
-	if err != nil {
-		return err
-	}
 	encoder := json.NewEncoder(f)
 	err = encoder.Encode(something)
 	if err != nil {
