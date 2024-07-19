@@ -2,51 +2,62 @@ package file
 
 import (
 	"fmt"
-	"io"
+	"github.com/rogelioConsejo/golibs/helpers"
 	"os"
 	"testing"
 )
 
 func TestPersistence(t *testing.T) {
+	const routines = 10
+	t.Cleanup(func() {
+		err := makePersistence().(*persistence).destroy()
+		if err != nil {
+			fmt.Printf("could not destroy: %s", err.Error())
+		}
+	})
+	/* make parallel tests with the defined amount of routines */
+	t.Run("parallel", func(t *testing.T) {
+		t.Parallel()
+		for i := 0; i < routines; i++ {
+			t.Run(fmt.Sprintf("routine-%d", i), testPersistence)
+		}
+	})
+
+}
+
+func testPersistence(t *testing.T) {
+	t.Helper()
 	p := makePersistence()
-	const text = "some text"
-	var smt DTO = DTO{SomeText: text}
-	err := p.Save(smt)
+	p.Lock()
+	defer p.Unlock()
+	var text = helpers.MakeRandomString(10)
+	var dto = DTO{}
+	err := p.Get(&dto)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatalf("could not get: %s", err.Error())
 	}
-	var retrievedSomething DTO
-	p2 := makePersistence()
-	err = p2.Get(&retrievedSomething)
-
-	if savedText, retrievedText := smt.Text(), retrievedSomething.Text(); savedText != retrievedText {
-		t.Errorf("did not retrieve 'DTO' correctly: expected (%s) -- retrieved (%s)", savedText, retrievedText)
+	if dto.Data == nil {
+		dto.Data = make(map[string]interface{})
 	}
-
-	const otherText = "some other text"
-	smt.SomeText = otherText
-	err = p.Save(smt)
+	dto.Data[text] = true
+	err = p.Save(dto)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatalf("could not save: %s", err.Error())
 	}
 
-	err = p2.Get(&retrievedSomething)
-	if err != nil && err != io.EOF {
-		t.Fatalf(err.Error())
-	}
-	if retrievedSomething.Text() != otherText {
-		t.Fatalf("did not update 'something'")
-	}
-
-	err = p.(*persistence).destroy()
+	var dto2 = DTO{}
+	err = p.Get(&dto2)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatalf("could not get: %s", err.Error())
+	}
+	if _, ok := dto2.Data[text]; !ok {
+		t.Fatalf("could not find the text in the dto")
 	}
 }
 
 func makePersistence() Persistence {
 	var fileName Name = "filename.test"
-	var p = New(fileName)
+	var p = GetPersistence(fileName)
 	return p
 }
 
@@ -59,9 +70,5 @@ func (p *persistence) destroy() error {
 }
 
 type DTO struct {
-	SomeText string `json:"some_text"`
-}
-
-func (s DTO) Text() string {
-	return s.SomeText
+	Data map[string]interface{}
 }

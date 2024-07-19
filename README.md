@@ -10,7 +10,7 @@
  ## Features
     - Basic CORS handling
     - Basic User Authentication
-    - Simple File Persistence
+    - Simple File Persistence with concurrency support
 
 ## Getting Started
 ### Installation
