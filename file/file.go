@@ -5,20 +5,24 @@ import (
 	"errors"
 	"io"
 	"os"
+	"sync"
 )
 
 // GetPersistence returns a Persistence that saves and gets something from the given file, it is thread safe and returns
 // the same instance for the same file
 func GetPersistence(n Name) Persistence {
-	if p, ok := persistences[n]; ok {
+	mu.Lock()
+	defer mu.Unlock()
+	if p, ok := persistenceMap[n]; ok {
 		return p
 	}
 	p := &persistence{mutex: NewMutex(n)}
-	persistences[n] = p
+	persistenceMap[n] = p
 	return p
 }
 
-var persistences = make(map[Name]Persistence)
+var persistenceMap = make(map[Name]Persistence)
+var mu sync.Mutex
 
 // New (deprecated) returns a new Persistence that saves and gets something from the given file
 func New(n Name) Persistence {
@@ -32,7 +36,9 @@ type Persistence interface {
 	Save(something interface{}) error
 	// Get reads the file and stores the content in the given something (which must be a pointer)
 	Get(something interface{}) error
+	// Lock locks the persistence for writing (it is thread safe)
 	Lock()
+	// Unlock unlocks the persistence
 	Unlock()
 }
 
