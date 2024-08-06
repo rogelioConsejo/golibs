@@ -22,6 +22,7 @@ go get github.com/rogelioConsejo/golibs
 ### Usage
 To use the libraries in your project, you can import them in your Go source files:
 ```go
+package your_project
 import "github.com/rogelioConsejo/golibs/cors"
 import "github.com/rogelioConsejo/golibs/auth"
 import "github.com/rogelioConsejo/golibs/file"
@@ -37,3 +38,6 @@ If you have any suggestions, feature requests, or bug reports, please feel free 
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Changelog
+See the [CHANGELOG](CHANGELOG.md) file for details.
