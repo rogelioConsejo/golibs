@@ -2,11 +2,12 @@ package cors
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/google/uuid"
 )
 
 func TestCORSEnabler(t *testing.T) {
@@ -48,5 +49,8 @@ type testHandler struct {
 
 func (t testHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	foo := request.FormValue("foo")
-	writer.Write([]byte(fmt.Sprintf("Hello World - %s", foo)))
+	_, err := writer.Write([]byte(fmt.Sprintf("Hello World - %s", foo)))
+	if err != nil {
+		panic(err)
+	}
 }

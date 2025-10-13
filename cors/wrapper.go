@@ -16,6 +16,7 @@ type Wrapper interface {
 	SetOrigin(URL)
 	AddMethod(s Method)
 	SetAllowCredentials()
+	AddHeader(Header)
 }
 
 // URL is a type that represents a URL
@@ -24,10 +25,17 @@ type URL string
 // Method is a type that represents an HTTP method
 type Method string
 
+type Header string
+
 type wrapper struct {
 	origin            URL
 	methods           map[Method]bool
 	allowsCredentials bool
+	headers           []Header
+}
+
+func (w *wrapper) AddHeader(header Header) {
+	w.headers = append(w.headers, header)
 }
 
 // SetAllowCredentials sets the CORS configuration to allow credentials
@@ -54,5 +62,16 @@ func (w *wrapper) Wrap(h http.Handler) http.Handler {
 	for m := range w.methods {
 		methods = append(methods, string(m))
 	}
-	return corsEnabledHandler{handler: h, origin: w.origin, methods: methods, allowsCredentials: w.allowsCredentials}
+	var headers []string
+	for _, head := range w.headers {
+		headers = append(headers, string(head))
+	}
+
+	return corsEnabledHandler{
+		handler:           h,
+		origin:            w.origin,
+		methods:           methods,
+		allowsCredentials: w.allowsCredentials,
+		headers:           headers,
+	}
 }

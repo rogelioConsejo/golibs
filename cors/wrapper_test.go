@@ -109,3 +109,99 @@ func TestWrapper_SetAllowCredentials(t *testing.T) {
 		}
 	})
 }
+
+// --- Helper functions for new tests ---
+
+// getResponseHeaders executes a request with the given method and returns response headers.
+func getResponseHeaders(w Wrapper, method string) http.Header {
+	h := testHandler{}
+	wrapped := w.Wrap(h)
+	req := httptest.NewRequest(method, "/foo", nil)
+	recorder := httptest.NewRecorder()
+	wrapped.ServeHTTP(recorder, req)
+	return recorder.Header()
+}
+
+// headerContainsValue checks if a comma-separated header contains the specified value (case-insensitive).
+func headerContainsValue(headerValue, searchValue string) bool {
+	values := strings.Split(headerValue, ",")
+	for _, v := range values {
+		if strings.EqualFold(strings.TrimSpace(v), searchValue) {
+			return true
+		}
+	}
+	return false
+}
+
+// --- New tests for Access-Control-Allow-Headers ---
+
+func TestWrapper_AddHeader(t *testing.T) {
+	t.Parallel()
+
+	t.Run("Access-Control-Allow-Headers is empty by default on preflight requests", func(t *testing.T) {
+		t.Parallel()
+		w := NewWrapper()
+		headers := getResponseHeaders(w, "OPTIONS")
+		allowHeaders := headers.Get("Access-Control-Allow-Headers")
+
+		if allowHeaders != "" {
+			t.Errorf("Expected Access-Control-Allow-Headers to be empty, got: %s", allowHeaders)
+		}
+	})
+
+	t.Run("AddHeader adds a single header to Access-Control-Allow-Headers", func(t *testing.T) {
+		t.Parallel()
+		w := NewWrapper()
+
+		// Desired API: allow specifying a custom header
+		w.AddHeader("Content-Type")
+
+		headers := getResponseHeaders(w, "OPTIONS")
+		allowHeaders := headers.Get("Access-Control-Allow-Headers")
+
+		if !headerContainsValue(allowHeaders, "Content-Type") {
+			t.Errorf("Expected Access-Control-Allow-Headers to contain 'Content-Type', got: %s", allowHeaders)
+		}
+	})
+
+	t.Run("AddHeader adds multiple headers to Access-Control-Allow-Headers", func(t *testing.T) {
+		t.Parallel()
+		w := NewWrapper()
+
+		// Desired API: allow specifying multiple custom headers
+		w.AddHeader("Content-Type")
+		w.AddHeader("Authorization")
+		w.AddHeader("X-Custom-Header")
+
+		headers := getResponseHeaders(w, "OPTIONS")
+		allowHeaders := headers.Get("Access-Control-Allow-Headers")
+
+		if !headerContainsValue(allowHeaders, "Content-Type") {
+			t.Errorf("Expected Access-Control-Allow-Headers to contain 'Content-Type', got: %s", allowHeaders)
+		}
+		if !headerContainsValue(allowHeaders, "Authorization") {
+			t.Errorf("Expected Access-Control-Allow-Headers to contain 'Authorization', got: %s", allowHeaders)
+		}
+		if !headerContainsValue(allowHeaders, "X-Custom-Header") {
+			t.Errorf("Expected Access-Control-Allow-Headers to contain 'X-Custom-Header', got: %s", allowHeaders)
+		}
+	})
+
+	t.Run("Access-Control-Allow-Headers only appears on OPTIONS requests", func(t *testing.T) {
+		t.Parallel()
+		w := NewWrapper()
+		w.AddHeader("Content-Type")
+
+		// Check that it appears on OPTIONS (preflight)
+		optionsHeaders := getResponseHeaders(w, "OPTIONS")
+		if optionsHeaders.Get("Access-Control-Allow-Headers") == "" {
+			t.Error("Expected Access-Control-Allow-Headers to be set on OPTIONS request")
+		}
+
+		// Check that it doesn't appear on regular GET requests
+		getHeaders := getResponseHeaders(w, "GET")
+		if getHeaders.Get("Access-Control-Allow-Headers") != "" {
+			t.Error("Expected Access-Control-Allow-Headers to be empty on GET request")
+		}
+	})
+}

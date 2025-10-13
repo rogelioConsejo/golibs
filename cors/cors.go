@@ -16,6 +16,7 @@ type corsEnabledHandler struct {
 	methods           []string
 	origin            URL
 	allowsCredentials bool
+	headers           []string
 }
 
 func (c corsEnabledHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
@@ -24,11 +25,14 @@ func (c corsEnabledHandler) ServeHTTP(writer http.ResponseWriter, request *http.
 		c.handleOptionsResponse(writer)
 		return
 	}
+	if c.allowsCredentials {
+		writer.Header().Set("Access-Control-Allow-Credentials", "true")
+	}
 	c.handler.ServeHTTP(writer, request)
 }
 
 func (c corsEnabledHandler) handleOptionsResponse(writer http.ResponseWriter) {
-	writer.Header().Set("Access-Control-Allow-Headers", "*")
+	writer.Header().Set("Access-Control-Allow-Headers", strings.Join(c.headers, ","))
 	methods := append(c.methods, http.MethodOptions)
 	writer.Header().Set("Access-Control-Allow-Methods", strings.Join(methods, ","))
 	if c.allowsCredentials {
